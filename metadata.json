@@ -1,0 +1,6 @@
+{
+  "name": "JanVote AI",
+  "description": "Intelligent Election Education Assistant for voters and volunteers, featuring interactive simulations and AI-powered guidance.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": []
+}

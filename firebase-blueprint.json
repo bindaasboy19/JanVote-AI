@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile storing voter type and preferences",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userType": { "type": "string", "enum": ["first_time", "regular", "volunteer", "low_literacy"] },
+        "language": { "type": "string", "enum": ["en", "hi"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "userType", "language", "createdAt"]
+    },
+    "AwarenessScript": {
+      "title": "Awareness Script",
+      "description": "Educational scripts generated for awareness volunteers",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string" },
+        "prompt": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorId", "prompt", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Stores user profiling data"
+    },
+    "/awareness_scripts/{scriptId}": {
+      "schema": "AwarenessScript",
+      "description": "Stores generated scripts for volunteers"
+    }
+  }
+}

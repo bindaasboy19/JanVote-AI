@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // User Profile Validation
+    function isValidUser(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.userType in ['first_time', 'regular', 'volunteer', 'low_literacy'] &&
+             data.language in ['en', 'hi'] &&
+             data.createdAt is string;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming()) && 
+                    incoming().userId == existing().userId;
+    }
+
+    // Awareness Scripts Validation
+    function isValidScript(data) {
+      return data.authorId is string && data.authorId.size() <= 128 &&
+             data.prompt is string && data.prompt.size() <= 1000 &&
+             data.content is string && data.content.size() <= 10000 &&
+             data.createdAt is string;
+    }
+
+    match /awareness_scripts/{scriptId} {
+      allow read: if isSignedIn(); // Logged in users can read scripts
+      allow create: if isSignedIn() && isOwner(incoming().authorId) && isValidScript(incoming());
+      allow delete: if isSignedIn() && isOwner(existing().authorId);
+    }
+  }
+}
