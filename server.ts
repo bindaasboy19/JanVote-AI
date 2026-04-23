@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = 3000;
 
   app.use(express.json());
 
@@ -49,7 +49,7 @@ Always structure responses clearly using Markdown.
   app.post("/api/chat", async (req, res) => {
     try {
       const { prompt, userType, language = "en", history = [] } = req.body;
-      
+
       if (!process.env.GEMINI_API_KEY) {
         return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server. Please set it in your environment variables." });
       }
@@ -82,7 +82,7 @@ Always structure responses clearly using Markdown.
   app.post("/api/broadcast", async (req, res) => {
     try {
       const { prompt, userType, language = "en" } = req.body;
-      
+
       if (!process.env.GEMINI_API_KEY) {
         return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server. Please set it in your environment variables." });
       }
