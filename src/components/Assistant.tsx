@@ -72,16 +72,6 @@ export default function Assistant({ userProfile }: Props) {
     scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
   }, [messages]);
 
-  useEffect(() => {
-    // Preload voices to avoid the first-click robotic voice bug
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.getVoices();
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-      };
-    }
-  }, []);
-
   const handleSend = async (text: string) => {
     const content = text || input;
     if (!content.trim() || loading) return;

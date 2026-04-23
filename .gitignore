@@ -8,3 +8,5 @@ coverage/
 !.env.example
 .env.example
 firebase-applet-config.json
+!.src/lib/gemini.ts
+.env
