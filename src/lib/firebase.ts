@@ -13,8 +13,28 @@ const firebaseConfig = {
     firestoreDatabaseId: import.meta.env.VITE_FIRESTORE_DATABASE_ID || "(default)"
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+let app: any;
+let auth: any;
+let db: any;
 
+try {
+    if (!firebaseConfig.apiKey) {
+        throw new Error("VITE_FIREBASE_API_KEY is missing! Please set your environment variables and rebuild.");
+    }
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+} catch (error: any) {
+    console.error("Firebase Initialization Error:", error);
+    // Provide a fail-safe mock to prevent crashing the whole app
+    const mockApp = { name: '[DEFAULT]', options: {} };
+    auth = { 
+        app: mockApp,
+        currentUser: null, 
+        onAuthStateChanged: (cb: any) => { cb(null); return () => {}; } 
+    };
+    db = { app: mockApp };
+}
+
+export { auth, db };
 export default app;
