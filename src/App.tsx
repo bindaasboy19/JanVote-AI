@@ -14,8 +14,10 @@ import {
   BookOpen, 
   Clock, 
   ShieldCheck,
+  ShieldAlert,
   ChevronRight,
-  LogOut
+  LogOut,
+  AlertTriangle
 } from 'lucide-react';
 import { auth, db } from './lib/firebase';
 import { onAuthStateChanged, signInAnonymously, signOut } from 'firebase/auth';
@@ -26,13 +28,14 @@ import Assistant from './components/Assistant';
 import VotingSimulator from './components/VotingSimulator';
 import AwarenessBroadcast from './components/AwarenessBroadcast';
 import ElectionJourney from './components/ElectionJourney';
+import GrievanceAssistant from './components/GrievanceAssistant';
 
 export default function App() {
   const [user, setUser] = useState(auth.currentUser);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'assistant' | 'simulator' | 'journey' | 'broadcast'>('assistant');
+  const [activeTab, setActiveTab] = useState<'assistant' | 'simulator' | 'journey' | 'broadcast' | 'grievance'>('assistant');
 
   useEffect(() => {
     return onAuthStateChanged(auth, async (u) => {
@@ -211,6 +214,17 @@ export default function App() {
                 <AwarenessBroadcast userProfile={profile} />
               </motion.div>
             )}
+            {activeTab === 'grievance' && (
+              <motion.div
+                key="grievance"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex-1 h-full"
+              >
+                <GrievanceAssistant userProfile={profile} />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
 
@@ -267,6 +281,12 @@ export default function App() {
             active={activeTab === 'simulator'} 
             onClick={() => setActiveTab('simulator')} 
           />
+          <NavItem 
+            icon={<AlertTriangle size={20} />} 
+            label="Grievance" 
+            active={activeTab === 'grievance'} 
+            onClick={() => setActiveTab('grievance')} 
+          />
           {profile.userType === 'volunteer' && (
             <NavItem 
               icon={<Megaphone size={20} />} 
@@ -280,9 +300,13 @@ export default function App() {
 
       {/* Floating Action Button */}
       <div className="fixed bottom-20 right-4 md:bottom-8 md:right-8">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-200">
-           <Mic size={24} />
-        </div>
+        <button 
+          onClick={() => setActiveTab('grievance')}
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all active:scale-95"
+          title="Report Issue"
+        >
+           <ShieldAlert size={24} />
+        </button>
       </div>
     </div>
   );
